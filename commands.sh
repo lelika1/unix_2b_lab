@@ -1,67 +1,51 @@
-: ${FDIR="$HOME"}
-: ${FDIR_SYM=h}
+: "${FDIR=$HOME}"
+: "${FDIR_SYM=h}"
 
 _complete_file() {
-	local cur prev words cword split;
-    _init_completion -s || return;
-	_filedir;
+    _init_completion -s || return
+    _filedir
 }
 
 _cd_completion() {
-	export CDPATH=$FDIR
-	_cd
+    CDPATH="$FDIR" _cd
+}
+
+_mvcp_completion() {
+    if [[ "$COMP_CWORD" == "$1" ]] ; then
+        _cur_pwd="$(pwd)"
+        cd "$FDIR" && _complete_file
+        cd "$_cur_pwd"
+    else
+        _complete_file
+    fi
 }
 
 _mvh_completion() {
-	if [[ ${COMP_CWORD} == 2 ]] ; then
-		_cur_pwd=$(pwd)
-		cd $FDIR && _complete_file;
-		cd $_cur_pwd
-	else
-		_complete_file;
-	fi
+    _mvcp_completion 2
 }
 
 _mvfh_completion() {
-	if [[ ${COMP_CWORD} == 1 ]] ; then
-		_cur_pwd=$(pwd)
-		cd $FDIR && _complete_file;
-		cd $_cur_pwd
-	else
-		_complete_file;
-	fi
+    _mvcp_completion 1
 }
 
 _cdh() {
-	cd "$FDIR"/"$1"
+    cd "$FDIR"/"$1"
 }
 
 _mvh() {
-	s="$1"
-	d="$FDIR"/"$2"
-	mv "$s" "$d"
+    mv "$1" "$FDIR"/"$2"
 }
 
 _cph() {
-	s="$1"
-	d="$FDIR"/"$2"
-	cp "$s" "$d"
+    cp "$1" "$FDIR"/"$2"
 }
 
 _mvfh() {
-	d="$2"
-	if [ $# -eq 1 ]; then
-		d="./"
-	fi
-	mv "$FDIR"/"$1" "$d"
+    mv "$FDIR"/"$1" "${2-.}"
 }
 
 _cpfh() {
-	d="$2"
-	if [ $# -eq 1 ]; then
-		d="./"
-	fi
-	cp "$FDIR"/"$1" "$d"
+    cp "$FDIR"/"$1" "${2-.}"
 }
 
 complete -o nospace -F _cd_completion "cd${FDIR_SYM}"
