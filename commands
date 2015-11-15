@@ -1,0 +1,70 @@
+_complete_file() {
+	local cur prev words cword split;
+    _init_completion -s || return;
+	_filedir;
+}
+
+_cd_completion() {
+	export CDPATH=$HOME
+	_cd
+}
+
+_mvh_completion() {
+	if [[ ${COMP_CWORD} == 2 ]] ; then
+		_cur_pwd=$(pwd)
+		cd $HOME && _complete_file;
+		cd $_cur_pwd
+	fi
+	if [[ ${COMP_CWORD} == 1 ]] ; then
+		_complete_file;
+	fi
+}
+
+_mvfh_completion() {
+	if [[ ${COMP_CWORD} == 1 ]] ; then
+		_cur_pwd=$(pwd)
+		cd $HOME && _complete_file;
+		cd $_cur_pwd
+	fi
+	if [[ ${COMP_CWORD} == 2 ]] ; then
+		_complete_file;
+	fi
+}
+
+cdh() {
+	cd "$HOME"/"$1"
+}
+
+mvh() {
+	s="$1"
+	d="$HOME"/"$2"
+	mv "$s" "$d"
+}
+
+cph() {
+	s="$1"
+	d="$HOME"/"$2"
+	cp "$s" "$d"
+}
+
+mvfh() {
+	d="$2"
+	if [ $# -eq 1 ]; then
+		d="./"
+	fi
+	mv "$HOME"/"$1" "$d"
+}
+
+cpfh() {
+	d="$2"
+	if [ $# -eq 1 ]; then
+		d="./"
+	fi
+	cp "$HOME"/"$1" "$d"
+}
+
+complete -o nospace -F _cd_completion cdh
+complete -o nospace -F _mvh_completion mvh
+complete -o nospace -F _mvh_completion cph
+complete -o nospace -F _mvfh_completion mvfh
+complete -o nospace -F _mvfh_completion cpfh
